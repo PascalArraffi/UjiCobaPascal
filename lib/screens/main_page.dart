@@ -1,8 +1,11 @@
+
 import 'package:flutter/material.dart';
 import 'package:katalog_perpustakaan/constants/warna.dart';
+import 'package:katalog_perpustakaan/data/buku_data.dart';
 import 'package:katalog_perpustakaan/models/buku.dart';
 import 'package:katalog_perpustakaan/screens/borrow_screen.dart';
 import 'package:katalog_perpustakaan/screens/detail_screen.dart';
+import 'package:katalog_perpustakaan/screens/favorite_screen.dart';
 import 'package:katalog_perpustakaan/screens/home_screen.dart';
 import 'package:katalog_perpustakaan/screens/personal_screen.dart';
 
@@ -16,6 +19,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int halamanAktif = 0;
 
+  // Mengubah status peminjaman buku
   void ubahPeminjaman(Buku buku) {
     setState(() {
       buku.dipinjam = !buku.dipinjam;
@@ -34,6 +38,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  // Membuka halaman detail buku
   void bukaDetailBuku(Buku buku) {
     Navigator.push(
       context,
@@ -44,10 +49,31 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
     ).then((_) {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
+  // Menghapus buku dari daftar favorit
+  void hapusFavorit(Buku buku) {
+    setState(() {
+      buku.favorit = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${buku.judul} berhasil dihapus dari Favorit.',
+        ),
+        backgroundColor: cokelat,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  // Berpindah antarhalaman navigasi
   void pindahHalaman(int index) {
     setState(() {
       halamanAktif = index;
@@ -56,18 +82,23 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final judulHalaman = [
+      'ENJOY READING',
+      'BUKU PINJAMAN',
+      'PERSONAL',
+      'FAVORITE',
+    ];
+
     return Scaffold(
       backgroundColor: latar,
+
+      // AppBar
       appBar: AppBar(
         backgroundColor: latar,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          halamanAktif == 0
-              ? 'ENJOY READING'
-              : halamanAktif == 1
-                  ? 'BUKU PINJAMAN'
-                  : 'PERSONAL',
+          judulHalaman[halamanAktif],
           style: const TextStyle(
             fontSize: 21,
             fontWeight: FontWeight.w900,
@@ -91,6 +122,8 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
+
+      // Konten halaman
       body: SafeArea(
         child: IndexedStack(
           index: halamanAktif,
@@ -100,15 +133,24 @@ class _MainPageState extends State<MainPage> {
               onUbahPinjam: ubahPeminjaman,
               onPindahHalaman: pindahHalaman,
             ),
+
             BorrowScreen(
               onBukaDetail: bukaDetailBuku,
               onUbahPinjam: ubahPeminjaman,
               onCariBuku: () => pindahHalaman(0),
             ),
+
             const PersonalScreen(),
+
+            FavoriteScreen(
+              onBukaDetail: bukaDetailBuku,
+              onHapusFavorit: hapusFavorit,
+            ),
           ],
         ),
       ),
+
+      // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: halamanAktif,
         onTap: pindahHalaman,
@@ -124,15 +166,23 @@ class _MainPageState extends State<MainPage> {
             activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.book_outlined),
             activeIcon: Icon(Icons.book),
             label: 'Borrow',
           ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),
             label: 'Personal',
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star_border),
+            activeIcon: Icon(Icons.star),
+            label: 'Favorite',
           ),
         ],
       ),

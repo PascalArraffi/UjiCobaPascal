@@ -4,7 +4,9 @@ class Buku {
   final String kategori;
   final String gambar;
   final String deskripsi;
+
   bool dipinjam;
+  bool favorit;
 
   Buku({
     required this.judul,
@@ -13,5 +15,6 @@ class Buku {
     required this.gambar,
     required this.deskripsi,
     this.dipinjam = false,
+    this.favorit = false,
   });
 }

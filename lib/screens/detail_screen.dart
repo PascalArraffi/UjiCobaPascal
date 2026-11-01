@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:katalog_perpustakaan/constants/warna.dart';
 import 'package:katalog_perpustakaan/models/buku.dart';
@@ -17,12 +18,33 @@ class DetailBukuPage extends StatefulWidget {
 }
 
 class _DetailBukuPageState extends State<DetailBukuPage> {
+  // Menambahkan atau menghapus buku dari Favorit
+  void ubahFavorit() {
+    setState(() {
+      widget.buku.favorit = !widget.buku.favorit;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          widget.buku.favorit
+              ? 'Berhasil menambahkan buku kedalam daftar Favorit'
+              : 'Buku berhasil dihapus dari daftar Favorit.',
+        ),
+        backgroundColor: cokelat,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final buku = widget.buku;
 
     return Scaffold(
       backgroundColor: latar,
+
       appBar: AppBar(
         backgroundColor: latar,
         foregroundColor: cokelat,
@@ -31,11 +53,13 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Cover buku
             Center(
               child: Container(
                 padding: const EdgeInsets.all(12),
@@ -65,7 +89,10 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
                 ),
               ),
             ),
+
             const SizedBox(height: 25),
+
+            // Judul buku
             Text(
               buku.judul,
               style: const TextStyle(
@@ -74,7 +101,9 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
                 fontWeight: FontWeight.w900,
               ),
             ),
+
             const SizedBox(height: 10),
+
             Text(
               'Penulis: ${buku.penulis}',
               style: const TextStyle(
@@ -82,7 +111,9 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
                 fontSize: 14,
               ),
             ),
+
             const SizedBox(height: 8),
+
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -101,7 +132,9 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
                 ),
               ),
             ),
+
             const SizedBox(height: 25),
+
             const Text(
               'Deskripsi Buku',
               style: TextStyle(
@@ -110,7 +143,9 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+
             const SizedBox(height: 10),
+
             Text(
               buku.deskripsi,
               style: const TextStyle(
@@ -120,7 +155,10 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
               ),
               textAlign: TextAlign.justify,
             ),
+
             const SizedBox(height: 22),
+
+            // Status ketersediaan buku
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(13),
@@ -136,7 +174,9 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
                     buku.dipinjam
                         ? Icons.bookmark
                         : Icons.check_circle_outline,
-                    color: buku.dipinjam ? Colors.red : Colors.green,
+                    color: buku.dipinjam
+                        ? Colors.red
+                        : Colors.green,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -155,7 +195,49 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 25),
+
+            const SizedBox(height: 20),
+
+            // Tombol Favorit
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton.icon(
+                onPressed: ubahFavorit,
+                icon: Icon(
+                  buku.favorit
+                      ? Icons.star
+                      : Icons.star_border,
+                  color: buku.favorit
+                      ? Colors.amber
+                      : cokelat,
+                ),
+                label: Text(
+                  buku.favorit
+                      ? 'Hapus dari Favorit'
+                      : 'Tambahkan ke Favorit',
+                  style: const TextStyle(
+                    color: cokelat,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: buku.favorit
+                        ? Colors.amber
+                        : cokelat.withValues(alpha: 0.3),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Tombol Borrow It
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -170,7 +252,9 @@ class _DetailBukuPageState extends State<DetailBukuPage> {
                       : Icons.bookmark_add_outlined,
                 ),
                 label: Text(
-                  buku.dipinjam ? 'Kembalikan Buku' : 'Pinjam Buku',
+                  buku.dipinjam
+                      ? 'Kembalikan Buku'
+                      : 'Pinjam Buku',
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kuning,
